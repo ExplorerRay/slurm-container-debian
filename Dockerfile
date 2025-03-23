@@ -6,8 +6,6 @@ RUN apt-get update \
     # refers to https://slurm.schedmd.com/quickstart_admin.html#prereqs
     # for auth/munge
     munge libmunge-dev \
-    # for PMIx support
-    # libpmix-dev \
     # for DBD node accessing DB server
     mariadb-client \
     # for accounting_storage/mysql
@@ -44,6 +42,7 @@ RUN git clone -b ${SLURM_TAG} --single-branch --depth=1 https://github.com/Sched
 
 COPY ./config/slurm.conf /etc/slurm/
 COPY --chown=slurm:slurm --chmod=600 ./config/slurmdbd.conf /etc/slurm/
+COPY ./config/cgroup.conf /etc/slurm/
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
