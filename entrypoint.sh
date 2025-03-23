@@ -45,6 +45,13 @@ then
     echo "---> Starting the MUNGE Authentication service (munged) ..."
     sudo -u munge /usr/sbin/munged
 
+    # add compute node config
+    if ! grep -q "NodeName=$(hostname)" /etc/slurm/slurm.conf;
+    then
+        echo "---> Adding compute node configuration to /etc/slurm/slurm.conf ..."
+        /usr/local/sbin/slurmd -C | head -n 1 >> /etc/slurm/slurm.conf
+    fi
+
     echo "---> Waiting for slurmctld to become active before starting slurmd..."
 
     until 2>/dev/null >/dev/tcp/slurmctld/6817
