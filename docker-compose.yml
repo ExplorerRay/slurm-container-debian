@@ -51,6 +51,24 @@ services:
     networks:
       - slurm-network
 
+  slurmrestd:
+    image: slurm-debian
+    cap_add:
+      - SYS_ADMIN
+    command: ["slurmrestd"]
+    container_name: slurmrestd
+    hostname: slurmrestd
+    volumes:
+      - etc_munge:/etc/munge
+      - etc_slurm:/etc/slurm
+      - var_log_slurm:/var/log/slurm
+    expose:
+      - "6820"
+    depends_on:
+      - "slurmctld"
+    networks:
+      - slurm-network
+
   cmpt1:
     image: slurm-debian
     command: ["slurmd"]

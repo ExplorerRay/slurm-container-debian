@@ -29,6 +29,8 @@ RUN git clone -b ${SLURM_TAG} --single-branch --depth=1 https://github.com/Sched
     && rm -rf slurm \
     && groupadd -r --gid=151 slurm \
     && useradd -r -g slurm --uid=151 slurm \
+    && groupadd -r --gid=152 slurmrestd \
+    && useradd -r -g slurmrestd --uid=152 slurmrestd \
     && mkdir /var/spool/slurmd \
         /var/run/slurmd \
         /var/run/slurmdbd \
