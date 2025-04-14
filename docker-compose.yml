@@ -1,14 +1,15 @@
 services:
   mariadb:
-    image: mariadb:10.11
+    image: bitnami/mariadb-galera:11.4
     hostname: mariadb
     container_name: mariadb
     environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      # MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      ALLOW_EMPTY_PASSWORD: yes
       # need to be consistent with slurmdbd.conf
-      MYSQL_DATABASE: slurm_acct_db
-      MYSQL_USER: slurm
-      MYSQL_PASSWORD: password
+      MARIADB_DATABASE: slurm_acct_db
+      MARIADB_USER: slurm
+      MARIADB_PASSWORD: password
     volumes:
       - var_lib_mysql:/var/lib/mysql
     networks:
@@ -17,7 +18,8 @@ services:
   slurmdbd:
     image: slurm-debian
     build:
-      context: .
+      context: ./
+      dockerfile: ./container/slurm/Dockerfile
       args:
         SLURM_TAG: ${SLURM_TAG}
     command: ["slurmdbd"]
