@@ -42,11 +42,11 @@ RUN git clone -b ${SLURM_TAG} --single-branch --depth=1 https://github.com/Sched
     && chown -R slurm:slurm /var/*/slurm* \
     && sudo -u munge /usr/sbin/mungekey -f -v
 
-COPY ./config/slurm.conf /etc/slurm/
-COPY --chown=slurm:slurm --chmod=600 ./config/slurmdbd.conf /etc/slurm/
-COPY ./config/cgroup.conf /etc/slurm/
+COPY ./config/slurm/slurm.conf /etc/slurm/
+COPY --chown=slurm:slurm --chmod=600 ./config/slurm/slurmdbd.conf /etc/slurm/
+COPY ./config/slurm/cgroup.conf /etc/slurm/
 
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY ./container/slurm/entrypoint.sh /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 CMD ["slurmdbd"]
