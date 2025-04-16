@@ -1,0 +1,8 @@
+[galera]
+wsrep_on = ON
+wsrep_cluster_name = "Slurm Galera cluster"
+wsrep_cluster_address = gcomm://galera1,galera2,galera3
+binlog_format            = row
+default_storage_engine   = InnoDB
+innodb_autoinc_lock_mode = 2
+bind-address = 0.0.0.0
