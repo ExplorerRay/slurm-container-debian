@@ -1,17 +1,76 @@
 services:
-  mariadb:
-    image: bitnami/mariadb-galera:11.4
-    hostname: mariadb
-    container_name: mariadb
+  galera1:
+    image: slurm-db
+    build:
+      context: ./
+      dockerfile: ./container/db/Dockerfile
+    command: ["new_cluster"]
+    hostname: galera1
+    container_name: galera1
+    expose:
+      - "3306"
     environment:
-      # MYSQL_RANDOM_ROOT_PASSWORD: "yes"
-      ALLOW_EMPTY_PASSWORD: yes
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
       # need to be consistent with slurmdbd.conf
-      MARIADB_DATABASE: slurm_acct_db
-      MARIADB_USER: slurm
-      MARIADB_PASSWORD: password
+      MYSQL_DATABASE: slurm_acct_db
+      MYSQL_USER: slurm
+      MYSQL_PASSWORD: password
     volumes:
-      - var_lib_mysql:/var/lib/mysql
+      - var_lib_mysql1:/var/lib/mysql
+    networks:
+      - slurm-network
+
+  galera2:
+    image: slurm-db
+    hostname: galera2
+    container_name: galera2
+    command: ["add_cluster"]
+    expose:
+      - "3306"
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: slurm_acct_db
+      MYSQL_USER: slurm
+      MYSQL_PASSWORD: password
+    volumes:
+      - var_lib_mysql2:/var/lib/mysql
+    networks:
+      - slurm-network
+    depends_on:
+      - "galera1"
+
+  galera3:
+    image: slurm-db
+    hostname: galera3
+    container_name: galera3
+    command: ["add_cluster"]
+    expose:
+      - "3306"
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: slurm_acct_db
+      MYSQL_USER: slurm
+      MYSQL_PASSWORD: password
+    volumes:
+      - var_lib_mysql3:/var/lib/mysql
+    networks:
+      - slurm-network
+    depends_on:
+      - "galera1"
+
+  dbproxy:
+    image: dbproxy
+    build:
+      context: ./
+      dockerfile: ./container/haproxy/Dockerfile
+    container_name: dbproxy
+    hostname: dbproxy
+    expose:
+      - "3306"
+    depends_on:
+      - "galera1"
+      - "galera2"
+      - "galera3"
     networks:
       - slurm-network
 
@@ -32,7 +91,7 @@ services:
     expose:
       - "6819"
     depends_on:
-      - mariadb
+      - "dbproxy"
     networks:
       - slurm-network
 
@@ -109,7 +168,9 @@ volumes:
   etc_munge:
   etc_slurm:
   slurm_jobdir:
-  var_lib_mysql:
+  var_lib_mysql1:
+  var_lib_mysql2:
+  var_lib_mysql3:
   var_log_slurm:
 
 networks:
