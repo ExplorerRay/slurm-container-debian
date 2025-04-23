@@ -58,6 +58,22 @@ services:
     depends_on:
       - "galera1"
 
+  dbproxy:
+    image: dbproxy
+    build:
+      context: ./
+      dockerfile: ./container/haproxy/Dockerfile
+    container_name: dbproxy
+    hostname: dbproxy
+    expose:
+      - "3306"
+    depends_on:
+      - "galera1"
+      - "galera2"
+      - "galera3"
+    networks:
+      - slurm-network
+
   slurmdbd:
     image: slurm-debian
     build:
@@ -75,9 +91,7 @@ services:
     expose:
       - "6819"
     depends_on:
-      - "galera1"
-      - "galera2"
-      - "galera3"
+      - "dbproxy"
     networks:
       - slurm-network
 
