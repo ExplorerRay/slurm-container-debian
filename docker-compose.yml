@@ -75,17 +75,15 @@ services:
       - slurm-network
 
   slurmdbd:
-    image: slurm-debian
+    image: slurmdbd-debian
     build:
       context: ./
       dockerfile: ./container/slurm/Dockerfile
-      args:
-        SLURM_TAG: ${SLURM_TAG}
+      target: slurmdbd-debian
     command: ["slurmdbd"]
     container_name: slurmdbd
     hostname: slurmdbd
     volumes:
-      - etc_munge:/etc/munge
       - etc_slurm:/etc/slurm
       - var_log_slurm:/var/log/slurm
     expose:
@@ -96,12 +94,15 @@ services:
       - slurm-network
 
   slurmctld:
-    image: slurm-debian
+    image: slurmctld-debian
+    build:
+      context: ./
+      dockerfile: ./container/slurm/Dockerfile
+      target: slurmctld-debian
     command: ["slurmctld"]
     container_name: slurmctld
     hostname: slurmctld
     volumes:
-      - etc_munge:/etc/munge
       - etc_slurm:/etc/slurm
       - slurm_jobdir:/data
       - var_log_slurm:/var/log/slurm
@@ -113,14 +114,17 @@ services:
       - slurm-network
 
   slurmrestd:
-    image: slurm-debian
+    image: slurmrestd-debian
+    build:
+      context: ./
+      dockerfile: ./container/slurm/Dockerfile
+      target: slurmrestd-debian
     cap_add:
       - SYS_ADMIN
     command: ["slurmrestd"]
     container_name: slurmrestd
     hostname: slurmrestd
     volumes:
-      - etc_munge:/etc/munge
       - etc_slurm:/etc/slurm
       - var_log_slurm:/var/log/slurm
     expose:
@@ -131,12 +135,15 @@ services:
       - slurm-network
 
   cmpt1:
-    image: slurm-debian
+    image: slurmd-debian
+    build:
+      context: ./
+      dockerfile: ./container/slurm/Dockerfile
+      target: slurmd-debian
     command: ["slurmd"]
     hostname: cmpt1
     container_name: cmpt1
     volumes:
-      - etc_munge:/etc/munge
       - etc_slurm:/etc/slurm
       - slurm_jobdir:/data
       - var_log_slurm:/var/log/slurm
@@ -148,12 +155,11 @@ services:
       - slurm-network
 
   cmpt2:
-    image: slurm-debian
+    image: slurmd-debian
     command: ["slurmd"]
     hostname: cmpt2
     container_name: cmpt2
     volumes:
-      - etc_munge:/etc/munge
       - etc_slurm:/etc/slurm
       - slurm_jobdir:/data
       - var_log_slurm:/var/log/slurm
@@ -165,7 +171,6 @@ services:
       - slurm-network
 
 volumes:
-  etc_munge:
   etc_slurm:
   slurm_jobdir:
   var_lib_mysql1:

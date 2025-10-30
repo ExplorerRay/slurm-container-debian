@@ -3,9 +3,6 @@ set -e
 
 if [ "$1" = "slurmdbd" ]
 then
-    echo "---> Starting the MUNGE Authentication service (munged) ..."
-    sudo -u munge /usr/sbin/munged
-
     echo "---> Starting the Slurm Database Daemon (slurmdbd) ..."
 
     {
@@ -18,14 +15,11 @@ then
     }
     echo "-- Database is now active ..."
 
-    exec sudo -u slurm /usr/local/sbin/slurmdbd -Dvvv
+    exec sudo -u slurm slurmdbd -Dvvv
 fi
 
 if [ "$1" = "slurmctld" ]
 then
-    echo "---> Starting the MUNGE Authentication service (munged) ..."
-    sudo -u munge /usr/sbin/munged
-
     echo "---> Waiting for slurmdbd to become active before starting slurmctld ..."
 
     until 2>/dev/null >/dev/tcp/slurmdbd/6819
@@ -37,14 +31,11 @@ then
 
     echo "---> Starting the Slurm Controller Daemon (slurmctld) ..."
 
-    exec sudo -u slurm /usr/local/sbin/slurmctld -i -Dvvv
+    exec sudo -u slurm slurmctld -i -Dvvv
 fi
 
 if [ "$1" = "slurmrestd" ]
 then
-    echo "---> Starting the MUNGE Authentication service (munged) ..."
-    sudo -u munge /usr/sbin/munged
-
     echo "---> Waiting for slurmctld to become active before starting slurmd..."
 
     until 2>/dev/null >/dev/tcp/slurmctld/6817
@@ -55,19 +46,16 @@ then
     echo "-- slurmctld is now active ..."
 
     echo "---> Starting the Slurm REST Daemon (slurmrestd) ..."
-    exec sudo -u slurmrestd /usr/local/sbin/slurmrestd -vvvvv 0.0.0.0:6820
+    exec sudo -u slurmrestd slurmrestd -vvvvv 0.0.0.0:6820
 fi
 
 if [ "$1" = "slurmd" ]
 then
-    echo "---> Starting the MUNGE Authentication service (munged) ..."
-    sudo -u munge /usr/sbin/munged
-
     # add compute node config
     if ! grep -q "NodeName=$(hostname)" /etc/slurm/slurm.conf;
     then
         echo "---> Adding compute node configuration to /etc/slurm/slurm.conf ..."
-        /usr/local/sbin/slurmd -C | head -n 1 >> /etc/slurm/slurm.conf
+        slurmd -C | head -n 1 >> /etc/slurm/slurm.conf
     fi
 
     echo "---> Waiting for slurmctld to become active before starting slurmd..."
@@ -80,7 +68,7 @@ then
     echo "-- slurmctld is now active ..."
 
     echo "---> Starting the Slurm Node Daemon (slurmd) ..."
-    exec /usr/local/sbin/slurmd -Dvvv
+    exec slurmd -Dvvv
 fi
 
 exec "$@"

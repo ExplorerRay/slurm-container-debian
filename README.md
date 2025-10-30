@@ -1,11 +1,13 @@
 # slurm-container-debian
 Slurm cluster with debian image based containers
 
-Refers to https://github.com/giovtorres/slurm-docker-cluster and change to Debian image.
+Refers to [slurm-docker-cluster](https://github.com/giovtorres/slurm-docker-cluster) and [slinky containers](https://github.com/SlinkyProject/containers), then change to Debian image.
 
-## Extra features
+## Features
 - slurmrestd
-- Galera replaces original mariaDB
+  - Add `SYS_ADMIN` capability to avoid `fatal: Unable to unshare System V namespace: Operation not permitted` error.
+- Galera cluster replaces original mariaDB
+- Use sackd instead of munge
 
 ## Usage
 1. `git clone https://github.com/ExplorerRay/slurm-container-debian.git`
