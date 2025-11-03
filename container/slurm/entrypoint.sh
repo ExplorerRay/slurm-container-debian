@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+if [ ! -f /etc/slurm/slurm.key ]; then
+    dd if=/dev/random of=/etc/slurm/slurm.key bs=1024 count=1
+fi
+chmod 600 /etc/slurm/slurm.key
+chown -R slurm:slurm /var/log/slurm /etc/slurm
+
 if [ "$1" = "slurmdbd" ]
 then
     echo "---> Starting the Slurm Database Daemon (slurmdbd) ..."
@@ -36,14 +42,22 @@ fi
 
 if [ "$1" = "slurmrestd" ]
 then
-    echo "---> Waiting for slurmctld to become active before starting slurmd..."
+    # get cluster info with hostname
+    CLUSTER_NAME=$(hostname | sed 's/^[^-]*-//' | grep "cluster")
+    if [ -z "$CLUSTER_NAME" ]; then
+        DEPDENDENCY_NAME="slurmctld"
+    else
+        DEPDENDENCY_NAME="slurmctld-$CLUSTER_NAME"
+    fi
 
-    until 2>/dev/null >/dev/tcp/slurmctld/6817
+    echo "---> Waiting for $DEPDENDENCY_NAME to become active before starting slurmrestd..."
+
+    until 2>/dev/null >/dev/tcp/"$DEPDENDENCY_NAME"/6817
     do
-        echo "-- slurmctld is not available.  Sleeping ..."
+        echo "-- $DEPDENDENCY_NAME is not available.  Sleeping ..."
         sleep 2
     done
-    echo "-- slurmctld is now active ..."
+    echo "-- $DEPDENDENCY_NAME is now active ..."
 
     echo "---> Starting the Slurm REST Daemon (slurmrestd) ..."
     exec sudo -u slurmrestd slurmrestd -vvvvv 0.0.0.0:6820
@@ -58,14 +72,22 @@ then
         slurmd -C | head -n 1 >> /etc/slurm/slurm.conf
     fi
 
-    echo "---> Waiting for slurmctld to become active before starting slurmd..."
+    # get cluster info with hostname
+    CLUSTER_NAME=$(hostname | sed 's/^[^-]*-//' | grep "cluster")
+    if [ -z "$CLUSTER_NAME" ]; then
+        DEPDENDENCY_NAME="slurmctld"
+    else
+        DEPDENDENCY_NAME="slurmctld-$CLUSTER_NAME"
+    fi
 
-    until 2>/dev/null >/dev/tcp/slurmctld/6817
+    echo "---> Waiting for $DEPDENDENCY_NAME to become active before starting slurmd..."
+
+    until 2>/dev/null >/dev/tcp/"$DEPDENDENCY_NAME"/6817
     do
-        echo "-- slurmctld is not available.  Sleeping ..."
+        echo "-- $DEPDENDENCY_NAME is not available.  Sleeping ..."
         sleep 2
     done
-    echo "-- slurmctld is now active ..."
+    echo "-- $DEPDENDENCY_NAME is now active ..."
 
     echo "---> Starting the Slurm Node Daemon (slurmd) ..."
     exec slurmd -Dvvv
