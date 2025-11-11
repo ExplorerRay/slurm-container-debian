@@ -12,7 +12,7 @@ services:
       MYSQL_USER: slurm
       MYSQL_PASSWORD: password
     volumes:
-      - var_lib_mysql1:/var/lib/mysql
+      - var_lib_mysql:/var/lib/mysql
     networks:
       - slurm-network
 
@@ -38,7 +38,7 @@ services:
     hostname: slurmctld-cluster1
     volumes:
       - ./config/slurm-cluster1:/etc/slurm
-      - slurm_jobdir1:/data
+      - slurm_jobdir:/data
       - var_log_slurm1:/var/log/slurm
     expose:
       - "6817"
@@ -54,7 +54,7 @@ services:
     container_name: cmpt1-cluster1
     volumes:
       - ./config/slurm-cluster1:/etc/slurm
-      - slurm_jobdir1:/data
+      - slurm_jobdir:/data
       - var_log_slurm1:/var/log/slurm
     expose:
       - "6818"
@@ -70,7 +70,7 @@ services:
     container_name: cmpt2-cluster1
     volumes:
       - ./config/slurm-cluster1:/etc/slurm
-      - slurm_jobdir1:/data
+      - slurm_jobdir:/data
       - var_log_slurm1:/var/log/slurm
     expose:
       - "6818"
@@ -86,7 +86,7 @@ services:
     hostname: slurmctld-cluster2
     volumes:
       - ./config/slurm-cluster2:/etc/slurm
-      - slurm_jobdir1:/data
+      - slurm_jobdir:/data
       - var_log_slurm2:/var/log/slurm
     expose:
       - "6817"
@@ -102,7 +102,7 @@ services:
     container_name: cmpt1-cluster2
     volumes:
       - ./config/slurm-cluster2:/etc/slurm
-      - slurm_jobdir1:/data
+      - slurm_jobdir:/data
       - var_log_slurm2:/var/log/slurm
     expose:
       - "6818"
@@ -118,7 +118,7 @@ services:
     container_name: cmpt2-cluster2
     volumes:
       - ./config/slurm-cluster2:/etc/slurm
-      - slurm_jobdir1:/data
+      - slurm_jobdir:/data
       - var_log_slurm2:/var/log/slurm
     expose:
       - "6818"
@@ -128,11 +128,9 @@ services:
       - slurm-network
 
 volumes:
-  slurm_jobdir1:
-  var_lib_mysql1:
+  slurm_jobdir:
+  var_lib_mysql:
   var_log_slurm1:
-  slurm_jobdir2:
-  var_lib_mysql2:
   var_log_slurm2:
 
 networks:
