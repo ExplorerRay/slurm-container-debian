@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 if [ ! -f /etc/slurm/slurm.key ]; then
     dd if=/dev/random of=/etc/slurm/slurm.key bs=1024 count=1
